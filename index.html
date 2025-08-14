@@ -7,17 +7,42 @@
 <style>
     body {
         font-family: 'Segoe UI', sans-serif;
-        background-color: #f4f6f8;
         margin: 0;
         padding: 0;
         display: flex;
         flex-direction: column;
         align-items: center;
+        min-height: 100vh;
+        position: relative;
+        overflow: hidden;
     }
-    h1 { margin: 20px 0; color: #333; }
+
+    /* Particle container */
+    #particles-js {
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+        background: linear-gradient(-45deg, #2b2b2b, #1a1a1a, #333333, #000000);
+        background-size: 400% 400%;
+        animation: gradientBG 12s ease infinite;
+    }
+
+    @keyframes gradientBG {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+
+    h1 { margin: 20px 0; color: #FFD700; text-shadow: 0 0 10px rgba(255,215,0,0.8); }
     .card {
-        background: #fff; border-radius: 12px; padding: 20px; width: 350px;
-        box-shadow: 0px 4px 15px rgba(0,0,0,0.1); margin-bottom: 20px;
+        background: #fff;
+        border-radius: 12px;
+        padding: 20px;
+        width: 350px;
+        box-shadow: 0px 4px 20px rgba(255, 215, 0, 0.3);
+        margin-bottom: 20px;
     }
     .section-title { font-size: 18px; font-weight: bold; margin-bottom: 10px; color: #444; }
     .field {
@@ -25,18 +50,22 @@
         border-radius: 8px; background: #f9f9f9; cursor: pointer; transition: background 0.2s;
     }
     .field:hover { background: #ececec; }
-    .field i { margin-right: 10px; color: #007BFF; }
+    .field i { margin-right: 10px; color: #FFD700; }
     .field span { font-weight: bold; color: #222; }
     button {
-        width: 100%; padding: 12px; border: none; background: #007BFF;
-        color: white; font-size: 16px; border-radius: 8px; cursor: pointer;
+        width: 100%; padding: 12px; border: none; background: #FFD700;
+        color: black; font-size: 16px; font-weight: bold; border-radius: 8px; cursor: pointer;
+        box-shadow: 0 0 10px rgba(255,215,0,0.6);
     }
-    button:hover { background: #0056b3; }
+    button:hover { background: #e6c200; }
     .zip-search { display: flex; margin-top: 10px; gap: 8px; }
     input { flex: 1; padding: 10px; border-radius: 6px; border: 1px solid #ccc; }
 </style>
 </head>
 <body>
+
+<!-- Particle background container -->
+<div id="particles-js"></div>
 
 <h1>US Identity Generator</h1>
 
@@ -128,7 +157,36 @@ function searchByZip() {
 
 function copyText(element) {
     navigator.clipboard.writeText(element.children[1].innerText);
+    alert(`Copied: ${element.children[1].innerText}`);
 }
+</script>
+
+<!-- Particles.js library -->
+<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+<script>
+particlesJS("particles-js", {
+    particles: {
+        number: { value: 90, density: { enable: true, value_area: 800 } },
+        color: { value: "#FFD700" }, // Gold color
+        shape: { type: "circle" },
+        opacity: { value: 0.8, random: false },
+        size: { value: 4, random: true },
+        line_linked: { enable: true, distance: 150, color: "#FFD700", opacity: 0.9, width: 1.5 },
+        move: { enable: true, speed: 3, direction: "none", out_mode: "out" }
+    },
+    interactivity: {
+        detect_on: "canvas",
+        events: { 
+            onhover: { enable: true, mode: "grab" }, 
+            onclick: { enable: true, mode: "push" } 
+        },
+        modes: { 
+            grab: { distance: 160, line_linked: { opacity: 1 } }, 
+            push: { particles_nb: 4 } 
+        }
+    },
+    retina_detect: true
+});
 </script>
 
 </body>
