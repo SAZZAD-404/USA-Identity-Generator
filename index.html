@@ -17,22 +17,11 @@
         overflow: hidden;
     }
 
-    /* Particle container */
-    #particles-js {
+    canvas#particleCanvas {
         position: fixed;
         top: 0; left: 0;
-        width: 100%;
-        height: 100%;
+        width: 100%; height: 100%;
         z-index: -1;
-        background: linear-gradient(-45deg, #2b2b2b, #1a1a1a, #333333, #000000);
-        background-size: 400% 400%;
-        animation: gradientBG 12s ease infinite;
-    }
-
-    @keyframes gradientBG {
-        0% { background-position: 0% 50%; }
-        50% { background-position: 100% 50%; }
-        100% { background-position: 0% 50%; }
     }
 
     h1 { margin: 20px 0; color: #FFD700; text-shadow: 0 0 10px rgba(255,215,0,0.8); }
@@ -43,6 +32,8 @@
         width: 350px;
         box-shadow: 0px 4px 20px rgba(255, 215, 0, 0.3);
         margin-bottom: 20px;
+        z-index: 1;
+        position: relative;
     }
     .section-title { font-size: 18px; font-weight: bold; margin-bottom: 10px; color: #444; }
     .field {
@@ -64,8 +55,7 @@
 </head>
 <body>
 
-<!-- Particle background container -->
-<div id="particles-js"></div>
+<canvas id="particleCanvas"></canvas>
 
 <h1>US Identity Generator</h1>
 
@@ -105,7 +95,7 @@
 </div>
     
 <h1>Create By Sazzad</h1>
-    
+
 <script>
 let names = [];
 let addresses = [];
@@ -160,34 +150,109 @@ function searchByZip() {
 function copyText(element) {
     navigator.clipboard.writeText(element.children[1].innerText);
 }
-</script>
 
-<!-- Particles.js library -->
-<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
-<script>
-particlesJS("particles-js", {
-    particles: {
-        number: { value: 90, density: { enable: true, value_area: 800 } },
-        color: { value: "#FFD700" }, // Gold color
-        shape: { type: "circle" },
-        opacity: { value: 0.8, random: false },
-        size: { value: 4, random: true },
-        line_linked: { enable: true, distance: 150, color: "#FFD700", opacity: 0.9, width: 1.5 },
-        move: { enable: true, speed: 3, direction: "none", out_mode: "out" }
-    },
-    interactivity: {
-        detect_on: "canvas",
-        events: { 
-            onhover: { enable: true, mode: "grab" }, 
-            onclick: { enable: true, mode: "push" } 
-        },
-        modes: { 
-            grab: { distance: 160, line_linked: { opacity: 1 } }, 
-            push: { particles_nb: 4 } 
+// ================== Particle System ==================
+const canvas = document.getElementById("particleCanvas");
+const ctx = canvas.getContext("2d");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let particles = [];
+let mouse = { x: null, y: null, radius: 120 };
+let bgColors = [[15,32,39],[32,58,67],[44,83,100],[20,20,20]];
+let bgIndex=0, bgTargetIndex=1, bgStep=0;
+let particleColor={r:252,g:211,b:77};
+let particleColorTarget={r:Math.random()*255,g:Math.random()*255,b:Math.random()*255};
+
+function isTouchDevice(){
+    return 'ontouchstart' in window || navigator.maxTouchPoints>0;
+}
+
+if(isTouchDevice()){
+    window.addEventListener("touchmove", e=>{ if(e.touches.length>0){mouse.x=e.touches[0].clientX; mouse.y=e.touches[0].clientY;}});
+    window.addEventListener("touchend", ()=>{ mouse.x=null; mouse.y=null; });
+}else{
+    window.addEventListener("mousemove", e=>{ mouse.x=e.x; mouse.y=e.y; });
+    window.addEventListener("mouseout", ()=>{ mouse.x=null; mouse.y=null; });
+}
+
+window.addEventListener("resize", ()=>{ canvas.width=window.innerWidth; canvas.height=window.innerHeight; initParticles(); });
+
+class Particle{
+    constructor(x,y,dx,dy,s){ this.x=x; this.y=y; this.dx=dx; this.dy=dy; this.size=s; }
+    draw(){ ctx.beginPath(); ctx.arc(this.x,this.y,this.size,0,Math.PI*2); ctx.fillStyle=`rgb(${particleColor.r},${particleColor.g},${particleColor.b})`; ctx.fill(); }
+    update(){ 
+        if(this.x+this.size>canvas.width||this.x-this.size<0) this.dx=-this.dx; 
+        if(this.y+this.size>canvas.height||this.y-this.size<0) this.dy=-this.dy; 
+        this.x+=this.dx; this.y+=this.dy; this.draw(); 
+    }
+}
+
+function initParticles(){
+    particles=[];
+    for(let i=0;i<100;i++){
+        let s=Math.random()*3+1;
+        let x=Math.random()*canvas.width;
+        let y=Math.random()*canvas.height;
+        let dx=(Math.random()-0.5)*1.5;
+        let dy=(Math.random()-0.5)*1.5;
+        particles.push(new Particle(x,y,dx,dy,s));
+    }
+}
+
+function connectParticles(){
+    for(let a=0;a<particles.length;a++){
+        for(let b=a;b<particles.length;b++){
+            let dist=((particles[a].x-particles[b].x)**2)+((particles[a].y-particles[b].y)**2);
+            if(dist<140*140){
+                ctx.strokeStyle=`rgba(${particleColor.r},${particleColor.g},${particleColor.b},0.2)`;
+                ctx.lineWidth=1;
+                ctx.beginPath();
+                ctx.moveTo(particles[a].x,particles[a].y);
+                ctx.lineTo(particles[b].x,particles[b].y);
+                ctx.stroke();
+            }
         }
-    },
-    retina_detect: true
-});
+        if(mouse.x!=null && mouse.y!=null){
+            let md=((particles[a].x-mouse.x)**2)+((particles[a].y-mouse.y)**2);
+            if(md<mouse.radius*mouse.radius){
+                ctx.strokeStyle="rgba(255,255,255,0.3)";
+                ctx.beginPath();
+                ctx.moveTo(particles[a].x,particles[a].y);
+                ctx.lineTo(mouse.x,mouse.y);
+                ctx.stroke();
+            }
+        }
+    }
+}
+
+function updateColors(){
+    let c1=bgColors[bgIndex]; let c2=bgColors[bgTargetIndex];
+    let r=Math.round(c1[0]+(c2[0]-c1[0])*bgStep);
+    let g=Math.round(c1[1]+(c2[1]-c1[1])*bgStep);
+    let b=Math.round(c1[2]+(c2[2]-c1[2])*bgStep);
+    document.body.style.background=`rgb(${r},${g},${b})`;
+    bgStep+=0.002;
+    if(bgStep>=1){ bgStep=0; bgIndex=bgTargetIndex; bgTargetIndex=(bgTargetIndex+1)%bgColors.length; }
+
+    particleColor.r+=(particleColorTarget.r-particleColor.r)*0.01;
+    particleColor.g+=(particleColorTarget.g-particleColor.g)*0.01;
+    particleColor.b+=(particleColorTarget.b-particleColor.b)*0.01;
+    if(Math.abs(particleColor.r-particleColorTarget.r)<1){
+        particleColorTarget={r:Math.random()*255,g:Math.random()*255,b:Math.random()*255};
+    }
+}
+
+function animate(){
+    ctx.clearRect(0,0,canvas.width,canvas.height);
+    updateColors();
+    particles.forEach(p=>p.update());
+    connectParticles();
+    requestAnimationFrame(animate);
+}
+
+initParticles();
+animate();
 </script>
 
 </body>
