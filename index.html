@@ -126,7 +126,7 @@ function generateIdentity() {
     let fullName = names[Math.floor(Math.random() * names.length)];
     let phone = randomPhone();
     let dob = randomDOB();
-    let email = `${fullName.toLowerCase().replace(" ", ".")}${Math.floor(Math.random() * 200)}@gmail.com`;
+    let email = `${fullName.toLowerCase().replace(" ", ".")}${Math.floor(Math.random() * 300)}@gmail.com`;
     let address = addresses[Math.floor(Math.random() * addresses.length)];
 
     document.getElementById("name").children[1].innerText = fullName;
