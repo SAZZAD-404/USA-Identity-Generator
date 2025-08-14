@@ -94,7 +94,7 @@ function randomPhone() {
     let areaCode = Math.floor(Math.random() * (999 - 200) + 200);
     let mid = Math.floor(Math.random() * (999 - 200) + 200);
     let last = Math.floor(Math.random() * 9000) + 1000;
-    return `${areaCode} ${mid} ${last}`;
+    return `${areaCode}${mid}${last}`;
 }
 
 function generateIdentity() {
