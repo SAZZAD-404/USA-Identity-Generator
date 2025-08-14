@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>US Identity Generator</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+    body {
+        font-family: 'Segoe UI', sans-serif;
+        background-color: #f4f6f8;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    h1 { margin: 20px 0; color: #333; }
+    .card {
+        background: #fff; border-radius: 12px; padding: 20px; width: 350px;
+        box-shadow: 0px 4px 15px rgba(0,0,0,0.1); margin-bottom: 20px;
+    }
+    .section-title { font-size: 18px; font-weight: bold; margin-bottom: 10px; color: #444; }
+    .field {
+        display: flex; align-items: center; margin: 10px 0; padding: 10px;
+        border-radius: 8px; background: #f9f9f9; cursor: pointer; transition: background 0.2s;
+    }
+    .field:hover { background: #ececec; }
+    .field i { margin-right: 10px; color: #007BFF; }
+    .field span { font-weight: bold; color: #222; }
+    button {
+        width: 100%; padding: 12px; border: none; background: #007BFF;
+        color: white; font-size: 16px; border-radius: 8px; cursor: pointer;
+    }
+    button:hover { background: #0056b3; }
+    .zip-search { display: flex; margin-top: 10px; gap: 8px; }
+    input { flex: 1; padding: 10px; border-radius: 6px; border: 1px solid #ccc; }
+</style>
+</head>
+<body>
+
+<h1>US Identity Generator</h1>
+
+<div class="card">
+    <div class="section-title">Identity</div>
+
+    <div id="name" class="field" onclick="copyText(this)">
+        <i class="fas fa-user"></i> <span>Full Name</span>
+    </div>
+
+    <div id="phone" class="field" onclick="copyText(this)">
+        <i class="fas fa-phone"></i> <span>Phone</span>
+    </div>
+
+    <div id="dob" class="field" onclick="copyText(this)">
+        <i class="fas fa-calendar"></i> <span>Date of Birth</span>
+    </div>
+
+    <div id="address" class="field" onclick="copyText(this)">
+        <i class="fas fa-map-marker-alt"></i> <span>Address</span>
+    </div>
+
+    <div id="email" class="field" onclick="copyText(this)">
+        <i class="fas fa-envelope"></i> <span>Email</span>
+    </div>
+
+    <button onclick="generateIdentity()">Generate Random Identity</button>
+
+    <div class="section-title" style="margin-top:15px;">Search by ZIP</div>
+    <div class="zip-search">
+        <input type="text" id="zipInput" placeholder="Enter ZIP">
+        <button onclick="searchByZip()">Search</button>
+    </div>
+    <div id="zipResult" class="field" onclick="copyText(this)">
+        <i class="fas fa-location-arrow"></i> <span>ZIP Address</span>
+    </div>
+</div>
+
+<script>
+let names = [];
+let addresses = [];
+
+// Load datasets
+fetch("names.json").then(res => res.json()).then(data => names = data);
+fetch("addresses.json").then(res => res.json()).then(data => addresses = data);
+
+function randomDOB() {
+    let year = Math.floor(Math.random() * (2003 - 1970 + 1)) + 1970;
+    let month = String(Math.floor(Math.random() * 12) + 1).padStart(2, '0');
+    let day = String(Math.floor(Math.random() * 28) + 1).padStart(2, '0');
+    return `${month}/${day}/${year}`;
+}
+
+function randomPhone() {
+    let areaCode = Math.floor(Math.random() * (999 - 200) + 200);
+    let mid = Math.floor(Math.random() * (999 - 200) + 200);
+    let last = Math.floor(Math.random() * 9000) + 1000;
+    return `(${areaCode}) ${mid}-${last}`;
+}
+
+function generateIdentity() {
+    if (!names.length || !addresses.length) {
+        alert("Datasets loading... please wait.");
+        return;
+    }
+    let fullName = names[Math.floor(Math.random() * names.length)];
+    let phone = randomPhone();
+    let dob = randomDOB();
+    let email = `${fullName.toLowerCase().replace(" ", ".")}${Math.floor(Math.random() * 100)}@gmail.com`;
+    let address = addresses[Math.floor(Math.random() * addresses.length)];
+
+    document.getElementById("name").children[1].innerText = fullName;
+    document.getElementById("phone").children[1].innerText = phone;
+    document.getElementById("dob").children[1].innerText = dob;
+    document.getElementById("email").children[1].innerText = email;
+    document.getElementById("address").children[1].innerText = address.full;
+}
+
+function searchByZip() {
+    let zip = document.getElementById("zipInput").value;
+    let match = addresses.filter(a => a.zip === zip);
+    if (match.length) {
+        let address = match[Math.floor(Math.random() * match.length)];
+        document.getElementById("zipResult").children[1].innerText = address.full;
+    } else {
+        document.getElementById("zipResult").children[1].innerText = "ZIP not found";
+    }
+}
+
+function copyText(element) {
+    navigator.clipboard.writeText(element.children[1].innerText);
+    alert(`Copied: ${element.children[1].innerText}`);
+}
+</script>
+
+</body>
+</html>
