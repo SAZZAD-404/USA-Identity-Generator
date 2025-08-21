@@ -2,68 +2,177 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>US Identity Generator Create By Sazzad</title>
+<title>US Identity Generator</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
+    /* Base styles */
     body {
         font-family: 'Segoe UI', sans-serif;
         margin: 0;
         padding: 0;
+        min-height: 100vh;
         display: flex;
         flex-direction: column;
         align-items: center;
-        min-height: 100vh;
+        justify-content: center;
+        color: #fff;
         position: relative;
         overflow: hidden;
+        background: #0f172a;
     }
 
-    canvas#particleCanvas {
-        position: fixed;
-        top: 0; left: 0;
-        width: 100%; height: 100%;
-        z-index: -1;
+    /* Animated wave background */
+    .wave-bg {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        overflow: hidden;
+        z-index: 0;
+    }
+    .wave {
+        position: absolute;
+        width: 200%;
+        height: 200%;
+        top: -50%;
+        left: -50%;
+        background: radial-gradient(circle at center, #1d4ed8 0%, transparent 70%),
+                    radial-gradient(circle at 30% 70%, #9333ea 0%, transparent 60%),
+                    radial-gradient(circle at 70% 30%, #3b82f6 0%, transparent 60%),
+                    radial-gradient(circle at 80% 80%, #a855f7 0%, transparent 60%);
+        animation: rotate 25s linear infinite;
     }
 
-    h1 { margin: 20px 0; color: #FFD700; text-shadow: 0 0 10px rgba(255,215,0,0.8); }
+    @keyframes rotate {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
+    }
+
+    h1 {
+        margin: 20px 0;
+        font-size: 2.8rem;
+        font-weight: 700;
+        background: linear-gradient(90deg,#60a5fa,#a78bfa);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        z-index: 2;
+        text-align: center;
+    }
+
+    /* Glassmorphism card */
     .card {
-        background: #fff;
-        border-radius: 12px;
-        padding: 20px;
-        width: 350px;
-        box-shadow: 0px 4px 20px rgba(255, 215, 0, 0.3);
-        margin-bottom: 20px;
-        z-index: 1;
-        position: relative;
+        background: rgba(255,255,255,0.08);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255,255,255,0.25);
+        border-radius: 20px;
+        padding: 30px;
+        width: 440px;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.45);
+        transition: transform 0.3s, box-shadow 0.3s;
+        z-index: 2;
     }
-    .section-title { font-size: 18px; font-weight: bold; margin-bottom: 10px; color: #444; }
+    .card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 12px 40px rgba(0,0,0,0.65);
+    }
+
+    .section-title {
+        font-size: 21px;
+        font-weight: 600;
+        margin-bottom: 15px;
+        padding-bottom: 5px;
+        border-bottom: 1px solid rgba(255,255,255,0.2);
+        color: #e2e8f0;
+        letter-spacing: 0.5px;
+    }
+
+    /* Fields */
     .field {
-        display: flex; align-items: center; margin: 10px 0; padding: 10px;
-        border-radius: 8px; background: #f9f9f9; cursor: pointer; transition: background 0.2s;
+        display: flex;
+        align-items: center;
+        margin: 14px 0;
+        padding: 14px;
+        border-radius: 12px;
+        background: rgba(255,255,255,0.07);
+        cursor: pointer;
+        transition: background 0.2s, transform 0.2s;
     }
-    .field:hover { background: #ececec; }
-    .field i { margin-right: 10px; color: #FFD700; }
-    .field span { font-weight: bold; color: #222; }
+    .field:hover {
+        background: rgba(255,255,255,0.15);
+        transform: scale(1.02);
+    }
+    .field i {
+        margin-right: 12px;
+        color: #60a5fa;
+    }
+    .field span {
+        font-weight: 500;
+        color: #f8fafc;
+    }
+
+    /* Button */
     button {
-        width: 100%; padding: 12px; border: none; background: #FFD700;
-        color: black; font-size: 16px; font-weight: bold; border-radius: 8px; cursor: pointer;
-        box-shadow: 0 0 10px rgba(255,215,0,0.6);
+        width: 100%;
+        padding: 15px;
+        border: none;
+        background: linear-gradient(90deg,#3b82f6,#9333ea);
+        color: #fff;
+        font-size: 17px;
+        font-weight: 600;
+        border-radius: 12px;
+        cursor: pointer;
+        box-shadow: 0 4px 14px rgba(0,0,0,0.35);
+        transition: transform 0.2s, opacity 0.2s;
+        margin-top: 18px;
     }
-    button:hover { background: #e6c200; }
-    .zip-search { display: flex; margin-top: 10px; gap: 8px; }
-    input { flex: 1; padding: 10px; border-radius: 6px; border: 1px solid #ccc; }
+    button:hover {
+        opacity: 0.92;
+        transform: scale(1.04);
+    }
+
+    .zip-search {
+        display: flex;
+        margin-top: 18px;
+        gap: 10px;
+    }
+    input {
+        flex: 1;
+        padding: 12px;
+        border-radius: 10px;
+        border: 1px solid rgba(255,255,255,0.2);
+        background: rgba(255,255,255,0.1);
+        color: #fff;
+    }
+    input::placeholder { color: #cbd5e1; }
+
+    footer {
+        margin-top: 22px;
+        color: #cbd5e1;
+        font-size: 13px;
+        z-index: 2;
+        text-align: center;
+    }
+
 </style>
 </head>
 <body>
 
-<canvas id="particleCanvas"></canvas>
+<div class="wave-bg">
+    <div class="wave"></div>
+</div>
 
 <h1>US Identity Generator</h1>
 
 <div class="card">
-    <div class="section-title">Identity</div>
+    <div class="section-title">Generated Identity</div>
 
-    <div id="name" class="field" onclick="copyText(this)">
-        <i class="fas fa-user"></i> <span>Full Name</span>
+    <div id="firstname" class="field" onclick="copyText(this)">
+        <i class="fas fa-user"></i> <span>First Name</span>
+    </div>
+
+    <div id="lastname" class="field" onclick="copyText(this)">
+        <i class="fas fa-user"></i> <span>Last Name</span>
     </div>
 
     <div id="phone" class="field" onclick="copyText(this)">
@@ -82,7 +191,7 @@
         <i class="fas fa-envelope"></i> <span>Email</span>
     </div>
 
-    <button onclick="generateIdentity()">Generate Random Identity</button>
+    <button onclick="generateIdentity()">🎲 Generate New Identity</button>
 
     <div class="section-title" style="margin-top:15px;">Search by ZIP</div>
     <div class="zip-search">
@@ -94,7 +203,9 @@
     </div>
 </div>
     
-<h1>Create By Sazzad</h1>
+<footer>
+    <p>⚡ Project by Sazzad | Parsonal use only</p>
+</footer>
 
 <script>
 let names = [];
@@ -123,13 +234,17 @@ function generateIdentity() {
         alert("Datasets loading... please wait.");
         return;
     }
-    let fullName = names[Math.floor(Math.random() * names.length)];
+    let person = names[Math.floor(Math.random() * names.length)];
+    let firstName = person.first;
+    let lastName = person.last;
+
     let phone = randomPhone();
     let dob = randomDOB();
-    let email = `${fullName.toLowerCase().replace(" ", ".")}${Math.floor(Math.random() * 300)}@gmail.com`;
+    let email = `${firstName.toLowerCase()}.${lastName.toLowerCase()}${Math.floor(Math.random() * 300)}@gmail.com`;
     let address = addresses[Math.floor(Math.random() * addresses.length)];
 
-    document.getElementById("name").children[1].innerText = fullName;
+    document.getElementById("firstname").children[1].innerText = firstName;
+    document.getElementById("lastname").children[1].innerText = lastName;
     document.getElementById("phone").children[1].innerText = phone;
     document.getElementById("dob").children[1].innerText = dob;
     document.getElementById("email").children[1].innerText = email;
@@ -149,110 +264,9 @@ function searchByZip() {
 
 function copyText(element) {
     navigator.clipboard.writeText(element.children[1].innerText);
+    element.style.backgroundColor = "rgba(16,185,129,0.3)";
+    setTimeout(() => element.style.backgroundColor = "rgba(255,255,255,0.07)", 600);
 }
-
-// ================== Particle System ==================
-const canvas = document.getElementById("particleCanvas");
-const ctx = canvas.getContext("2d");
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
-
-let particles = [];
-let mouse = { x: null, y: null, radius: 120 };
-let bgColors = [[15,32,39],[32,58,67],[44,83,100],[20,20,20]];
-let bgIndex=0, bgTargetIndex=1, bgStep=0;
-let particleColor={r:252,g:211,b:77};
-let particleColorTarget={r:Math.random()*255,g:Math.random()*255,b:Math.random()*255};
-
-function isTouchDevice(){
-    return 'ontouchstart' in window || navigator.maxTouchPoints>0;
-}
-
-if(isTouchDevice()){
-    window.addEventListener("touchmove", e=>{ if(e.touches.length>0){mouse.x=e.touches[0].clientX; mouse.y=e.touches[0].clientY;}});
-    window.addEventListener("touchend", ()=>{ mouse.x=null; mouse.y=null; });
-}else{
-    window.addEventListener("mousemove", e=>{ mouse.x=e.x; mouse.y=e.y; });
-    window.addEventListener("mouseout", ()=>{ mouse.x=null; mouse.y=null; });
-}
-
-window.addEventListener("resize", ()=>{ canvas.width=window.innerWidth; canvas.height=window.innerHeight; initParticles(); });
-
-class Particle{
-    constructor(x,y,dx,dy,s){ this.x=x; this.y=y; this.dx=dx; this.dy=dy; this.size=s; }
-    draw(){ ctx.beginPath(); ctx.arc(this.x,this.y,this.size,0,Math.PI*2); ctx.fillStyle=`rgb(${particleColor.r},${particleColor.g},${particleColor.b})`; ctx.fill(); }
-    update(){ 
-        if(this.x+this.size>canvas.width||this.x-this.size<0) this.dx=-this.dx; 
-        if(this.y+this.size>canvas.height||this.y-this.size<0) this.dy=-this.dy; 
-        this.x+=this.dx; this.y+=this.dy; this.draw(); 
-    }
-}
-
-function initParticles(){
-    particles=[];
-    for(let i=0;i<100;i++){
-        let s=Math.random()*3+1;
-        let x=Math.random()*canvas.width;
-        let y=Math.random()*canvas.height;
-        let dx=(Math.random()-0.5)*1.5;
-        let dy=(Math.random()-0.5)*1.5;
-        particles.push(new Particle(x,y,dx,dy,s));
-    }
-}
-
-function connectParticles(){
-    for(let a=0;a<particles.length;a++){
-        for(let b=a;b<particles.length;b++){
-            let dist=((particles[a].x-particles[b].x)**2)+((particles[a].y-particles[b].y)**2);
-            if(dist<140*140){
-                ctx.strokeStyle=`rgba(${particleColor.r},${particleColor.g},${particleColor.b},0.2)`;
-                ctx.lineWidth=1;
-                ctx.beginPath();
-                ctx.moveTo(particles[a].x,particles[a].y);
-                ctx.lineTo(particles[b].x,particles[b].y);
-                ctx.stroke();
-            }
-        }
-        if(mouse.x!=null && mouse.y!=null){
-            let md=((particles[a].x-mouse.x)**2)+((particles[a].y-mouse.y)**2);
-            if(md<mouse.radius*mouse.radius){
-                ctx.strokeStyle="rgba(255,255,255,0.3)";
-                ctx.beginPath();
-                ctx.moveTo(particles[a].x,particles[a].y);
-                ctx.lineTo(mouse.x,mouse.y);
-                ctx.stroke();
-            }
-        }
-    }
-}
-
-function updateColors(){
-    let c1=bgColors[bgIndex]; let c2=bgColors[bgTargetIndex];
-    let r=Math.round(c1[0]+(c2[0]-c1[0])*bgStep);
-    let g=Math.round(c1[1]+(c2[1]-c1[1])*bgStep);
-    let b=Math.round(c1[2]+(c2[2]-c1[2])*bgStep);
-    document.body.style.background=`rgb(${r},${g},${b})`;
-    bgStep+=0.002;
-    if(bgStep>=1){ bgStep=0; bgIndex=bgTargetIndex; bgTargetIndex=(bgTargetIndex+1)%bgColors.length; }
-
-    particleColor.r+=(particleColorTarget.r-particleColor.r)*0.01;
-    particleColor.g+=(particleColorTarget.g-particleColor.g)*0.01;
-    particleColor.b+=(particleColorTarget.b-particleColor.b)*0.01;
-    if(Math.abs(particleColor.r-particleColorTarget.r)<1){
-        particleColorTarget={r:Math.random()*255,g:Math.random()*255,b:Math.random()*255};
-    }
-}
-
-function animate(){
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    updateColors();
-    particles.forEach(p=>p.update());
-    connectParticles();
-    requestAnimationFrame(animate);
-}
-
-initParticles();
-animate();
 </script>
 
 </body>
